@@ -4,8 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using TodoList.Models;
-using TodoList.Services.PasswordHash;
-using TodoList.Services.TokenGenerator;
+//using TodoList.Services.PasswordHash;
+//using TodoList.Services.TokenGenerator;
 
 internal class Program
 {
@@ -22,10 +22,26 @@ internal class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<BCryptPasswordHash>();
-        builder.Services.AddSingleton<AccessTokenGenerator>();
-        
+        //builder.Services.AddSingleton<BCryptPasswordHash>();
+        //builder.Services.AddSingleton<AccessTokenGenerator>();
 
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+             .AddJwtBearer(options =>
+             {
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuerSigningKey = true,
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                         .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+                     ValidateIssuer = false,
+                     ValidateAudience = false
+                 };
+             });
+        builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
+            policy =>
+            {
+                policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+            }));
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
