@@ -11,10 +11,10 @@ namespace TodoList.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LogsController : ControllerBase
+    public class AuthsController : ControllerBase
     {
         private readonly ILog _ilog;
-        public LogsController(ILog log)
+        public AuthsController(ILog log)
         {
             _ilog = log;
         }
@@ -25,10 +25,10 @@ namespace TodoList.Controllers
             return user;
         }
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login([FromBody] UserRequest userRequest)
+        public async Task<ActionResult> Login([FromBody] UserRequest userRequest)
         {
             string accessToken = await _ilog.Login(userRequest);
-            return accessToken;
+            return Ok();
         }
     }
 }
