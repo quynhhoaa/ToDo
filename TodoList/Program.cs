@@ -25,7 +25,7 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<BCryptPasswordHash>();
         builder.Services.AddSingleton<AccessTokenGenerator>();
-        builder.Services.AddScoped<ILog, Log>();
+        builder.Services.AddScoped<ILogService, LogService>();
         
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      .AddJwtBearer(options =>

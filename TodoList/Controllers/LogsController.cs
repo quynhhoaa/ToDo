@@ -13,22 +13,23 @@ namespace TodoList.Controllers
     [ApiController]
     public class AuthsController : ControllerBase
     {
-        private readonly ILog _ilog;
-        public AuthsController(ILog log)
+        private readonly ILogService _ilogService;
+        public AuthsController(ILogService ilogService)
         {
-            _ilog = log;
+            _ilogService = ilogService;
         }
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register([FromBody] UserRequest userRequest)
         {
-            User user = await _ilog.Register(userRequest);
+            var user = await _ilogService.Register(userRequest);
+            if (user == null) return BadRequest("Username or Email already exis");
             return user;
         }
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UserRequest userRequest)
         {
-            string accessToken = await _ilog.Login(userRequest);
-            return Ok();
+            var accessToken = await _ilogService.Login(userRequest);
+            return Ok(accessToken);
         }
     }
 }

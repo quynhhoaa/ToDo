@@ -5,13 +5,12 @@ using TodoList.Services.TokenGenerator;
 
 namespace TodoList.Services.Log
 {
-    public class Log : ILog
+    public class LogService : ILogService
     {
         private readonly BCryptPasswordHash _bCryptPasswordHash;
-        public static User user = new User();
         public readonly TodoDbContext _todoDbContext;
         public readonly AccessTokenGenerator _tokenGenerator;
-        public Log(BCryptPasswordHash bCryptPasswordHash, TodoDbContext todoDbContext, AccessTokenGenerator tokenGenerator)
+        public LogService(BCryptPasswordHash bCryptPasswordHash, TodoDbContext todoDbContext, AccessTokenGenerator tokenGenerator)
         {
             _bCryptPasswordHash = bCryptPasswordHash;
             _todoDbContext = todoDbContext;
@@ -19,20 +18,26 @@ namespace TodoList.Services.Log
         }
         public async Task<string> Login(UserRequest userRequest)
         {
+            string message = "";
             var user = _todoDbContext.Users.SingleOrDefault(x => x.Username == userRequest.Username);
             if (user == null)
             {
-                return null;
+                message = "Username is invalid";
+                return message;
             }
             if (!_bCryptPasswordHash.VerifyPassword(userRequest.Password, user.PasswordHash))
             {
-                return null;
+                message = "Password is invalid";
+                return message;
             }
             string token = _tokenGenerator.CreateToken(user);
             return token;
         }
         public async Task<User> Register(UserRequest userRequest)
         {
+            var model = _todoDbContext.Users.SingleOrDefault(x => x.Email == userRequest.Email || x.Username == userRequest.Username);
+            if(model != null) { return null; }
+            User user = new User();
             var passwordHash = _bCryptPasswordHash.HashPassword(userRequest.Password);
             user.Username = userRequest.Username;
             user.PasswordHash = passwordHash;
