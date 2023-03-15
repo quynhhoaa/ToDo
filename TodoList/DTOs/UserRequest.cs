@@ -14,6 +14,5 @@ namespace TodoList.DTOs
         [MaxLength(200)]
         [Required]
         public string Password { get; set; }
-        //public ICollection<Todo> Tasks { get; set; }
     }
 }
