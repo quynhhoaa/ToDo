@@ -5,7 +5,9 @@ namespace TodoList.Services.Log
 {
     public interface ILogService
     {
-        Task<User> Register(UserRequest userRequest);
-        Task<string> Login(UserRequest userRequest);
+        Task<UserResponse> GetByEmail(string email);
+        Task<UserResponse> GetByUsername(string username);
+        bool CheckLogin(LoginRequest loginRequest);
+        Task<User> Register(RegisterRequest registerRequest);
     }
 }

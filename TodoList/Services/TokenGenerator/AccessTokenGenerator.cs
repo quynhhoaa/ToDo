@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using TodoList.DTOs;
 using TodoList.Models;
 
 namespace TodoList.Services.TokenGenerator
@@ -13,7 +14,7 @@ namespace TodoList.Services.TokenGenerator
         {
             _configuration = configuration;
         }
-        public string CreateToken(User user)
+        public string CreateToken(UserResponse user)
         {
             List<Claim> claims = new List<Claim>
             {

@@ -16,32 +16,52 @@ namespace TodoList.Services.Log
             _todoDbContext = todoDbContext;
             _tokenGenerator = tokenGenerator;
         }
-        public async Task<string> Login(UserRequest userRequest)
+        public Task<UserResponse> GetByEmail(string email)
         {
-            string message = "";
-            var user = _todoDbContext.Users.SingleOrDefault(x => x.Username == userRequest.Username);
+            var user = _todoDbContext.Users.FirstOrDefault(x => x.Email == email);
+            UserResponse userResponse = new UserResponse();
             if (user == null)
             {
-                message = "Username is invalid";
-                return message;
-            }
-            if (!_bCryptPasswordHash.VerifyPassword(userRequest.Password, user.PasswordHash))
+                userResponse = null;
+            }    
+            else
             {
-                message = "Password is invalid";
-                return message;
-            }
-            string token = _tokenGenerator.CreateToken(user);
-            return token;
+                userResponse.Id = user.Id;
+                userResponse.Email = email;
+                userResponse.Username = user.Username;
+            }    
+            return Task.FromResult(userResponse);
         }
-        public async Task<User> Register(UserRequest userRequest)
+        public Task<UserResponse> GetByUsername(string username)
         {
-            var model = _todoDbContext.Users.SingleOrDefault(x => x.Email == userRequest.Email || x.Username == userRequest.Username);
-            if(model != null) { return null; }
-            User user = new User();
-            var passwordHash = _bCryptPasswordHash.HashPassword(userRequest.Password);
-            user.Username = userRequest.Username;
+            var user = _todoDbContext.Users.FirstOrDefault(x => x.Username == username);
+            UserResponse userResponse = new UserResponse();
+            if (user == null)
+            {
+                userResponse = null;
+            }    
+            else
+            {
+                userResponse.Id = user.Id;
+                userResponse.Username = username;
+                userResponse.Email = user.Email;
+            }    
+            return Task.FromResult(userResponse);
+        }
+        public bool CheckLogin(LoginRequest loginRequest)
+        {
+            var check = _todoDbContext.Users.Where(x => x.Username == loginRequest.Usename).FirstOrDefault();
+            return _bCryptPasswordHash.VerifyPassword(loginRequest.Password, check.PasswordHash);
+        }
+        public async Task<User> Register(RegisterRequest registerRequest)
+        {
+            var model = _todoDbContext.Users.SingleOrDefault(x => x.Email == registerRequest.Email || x.Username == registerRequest.Username);
+            
+            var user = new User();
+            var passwordHash = _bCryptPasswordHash.HashPassword(registerRequest.Password);
+            user.Username = registerRequest.Username;
             user.PasswordHash = passwordHash;
-            user.Email = userRequest.Email;
+            user.Email = registerRequest.Email;
             user.Id = new Guid();
             _todoDbContext.Add(user);
             await _todoDbContext.SaveChangesAsync();
