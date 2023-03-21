@@ -21,24 +21,22 @@ namespace TodoList.Controllers
         {
             _ilogService = ilogService;
             _accessTokenGenerator = accessTokenGenerator;
-
         }
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register([FromBody] RegisterRequest registerRequest)
         {
-            UserResponse existUserByEmail = await _ilogService.GetByEmail(registerRequest.Email);
+            var existUserByEmail = await _ilogService.GetByEmail(registerRequest.Email);
             if (existUserByEmail != null)
             {
                 return BadRequest("Email already exist");
             }
-            UserResponse existUserByUsername = await _ilogService.GetByUsername(registerRequest.Username);
+            var existUserByUsername = await _ilogService.GetByUsername(registerRequest.Username);
             if (existUserByUsername != null)
             {
                 return BadRequest("Username already exist");
             }
             var user = await _ilogService.Register(registerRequest);
-            
-            return user;
+            return Ok(user);
         }
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest)

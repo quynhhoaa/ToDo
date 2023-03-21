@@ -1,4 +1,5 @@
-﻿using TodoList.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using TodoList.DTOs;
 using TodoList.Models;
 using TodoList.Services.PasswordHash;
 using TodoList.Services.TokenGenerator;
@@ -16,53 +17,52 @@ namespace TodoList.Services.Log
             _todoDbContext = todoDbContext;
             _tokenGenerator = tokenGenerator;
         }
-        public Task<UserResponse> GetByEmail(string email)
+        public async Task<UserResponse?> GetByEmail(string email)
         {
-            var user = _todoDbContext.Users.FirstOrDefault(x => x.Email == email);
-            UserResponse userResponse = new UserResponse();
+            var user = await _todoDbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
             if (user == null)
             {
-                userResponse = null;
-            }    
-            else
+               return null;
+            }
+            return new UserResponse
             {
-                userResponse.Id = user.Id;
-                userResponse.Email = email;
-                userResponse.Username = user.Username;
-            }    
-            return Task.FromResult(userResponse);
+                Id = user.Id,
+                Email = email,
+                Username = user.Username
+            };
         }
-        public Task<UserResponse> GetByUsername(string username)
+        public async Task<UserResponse?> GetByUsername(string username)
         {
-            var user = _todoDbContext.Users.FirstOrDefault(x => x.Username == username);
-            UserResponse userResponse = new UserResponse();
+            var user = await _todoDbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
             if (user == null)
             {
-                userResponse = null;
-            }    
-            else
+                return null;
+            }
+            else 
             {
-                userResponse.Id = user.Id;
-                userResponse.Username = username;
-                userResponse.Email = user.Email;
-            }    
-            return Task.FromResult(userResponse);
+                return new UserResponse
+                {
+                    Id = user.Id,
+                    Username = username,
+                    Email = user.Email
+                };
+            };  
         }
         public bool CheckLogin(LoginRequest loginRequest)
         {
-            var check = _todoDbContext.Users.Where(x => x.Username == loginRequest.Usename).FirstOrDefault();
+           var check = _todoDbContext.Users.Where(x => x.Username == loginRequest.Usename).FirstOrDefault();
             return _bCryptPasswordHash.VerifyPassword(loginRequest.Password, check.PasswordHash);
         }
         public async Task<User> Register(RegisterRequest registerRequest)
         {
-            var model = _todoDbContext.Users.SingleOrDefault(x => x.Email == registerRequest.Email || x.Username == registerRequest.Username);
-            
-            var user = new User();
             var passwordHash = _bCryptPasswordHash.HashPassword(registerRequest.Password);
-            user.Username = registerRequest.Username;
-            user.PasswordHash = passwordHash;
-            user.Email = registerRequest.Email;
-            user.Id = new Guid();
+            var user = new User 
+            {
+                Username = registerRequest.Username,
+                PasswordHash = passwordHash,
+                Email = registerRequest.Email,
+                Id = new Guid()
+            };
             _todoDbContext.Add(user);
             await _todoDbContext.SaveChangesAsync();
             return user;
