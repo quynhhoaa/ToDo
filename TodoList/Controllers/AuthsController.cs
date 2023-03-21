@@ -41,7 +41,7 @@ namespace TodoList.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            UserResponse user = await _ilogService.GetByUsername(loginRequest.Usename);
+            var user = await _ilogService.GetByUsername(loginRequest.Usename);
             if (user == null)
             {
                 return BadRequest();
