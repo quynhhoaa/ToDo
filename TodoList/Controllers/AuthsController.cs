@@ -44,7 +44,7 @@ namespace TodoList.Controllers
             var user = await _ilogService.GetByUsername(loginRequest.Usename);
             if (user == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             if (!_ilogService.CheckLogin(loginRequest))
             {
