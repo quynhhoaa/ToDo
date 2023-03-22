@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using TodoList.Models;
-using TodoList.Services.Log;
+using TodoList.Services.UserService;
 using TodoList.Services.PasswordHash;
 using TodoList.Services.TokenGenerator;
 
@@ -25,7 +25,7 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<BCryptPasswordHash>();
         builder.Services.AddSingleton<AccessTokenGenerator>();
-        builder.Services.AddScoped<ILogService, LogService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      .AddJwtBearer(options =>

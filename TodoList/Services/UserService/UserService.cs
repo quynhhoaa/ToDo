@@ -4,14 +4,14 @@ using TodoList.Models;
 using TodoList.Services.PasswordHash;
 using TodoList.Services.TokenGenerator;
 
-namespace TodoList.Services.Log
+namespace TodoList.Services.UserService
 {
-    public class LogService : ILogService
+    public class UserService : IUserService
     {
         private readonly BCryptPasswordHash _bCryptPasswordHash;
         public readonly TodoDbContext _todoDbContext;
         public readonly AccessTokenGenerator _tokenGenerator;
-        public LogService(BCryptPasswordHash bCryptPasswordHash, TodoDbContext todoDbContext, AccessTokenGenerator tokenGenerator)
+        public UserService(BCryptPasswordHash bCryptPasswordHash, TodoDbContext todoDbContext, AccessTokenGenerator tokenGenerator)
         {
             _bCryptPasswordHash = bCryptPasswordHash;
             _todoDbContext = todoDbContext;

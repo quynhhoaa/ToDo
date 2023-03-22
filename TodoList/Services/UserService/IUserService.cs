@@ -1,9 +1,9 @@
 ﻿using TodoList.DTOs;
 using TodoList.Models;
 
-namespace TodoList.Services.Log
+namespace TodoList.Services.UserService
 {
-    public interface ILogService
+    public interface IUserService
     {
         Task<UserResponse?> GetByEmail(string email);
         Task<UserResponse?> GetByUsername(string username);
