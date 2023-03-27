@@ -5,7 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using TodoList.Models;
-using TodoList.Services.ToDo;
+using TodoList.Services.UserService;
+using TodoList.Services.PasswordHash;
+using TodoList.Services.TokenGenerator;
+
 
 internal class Program
 {
@@ -20,9 +23,23 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddScoped<IToDoService, ToDoService>();
 
-        //builder.Services.AddSingleton(Mapper);
+        builder.Services.AddSingleton<BCryptPasswordHash>();
+        builder.Services.AddSingleton<AccessTokenGenerator>();
+        builder.Services.AddScoped<IUserService, UserService>();
+        
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+     .AddJwtBearer(options =>
+     {
+         options.TokenValidationParameters = new TokenValidationParameters
+         {
+             ValidateIssuerSigningKey = true,
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                 .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+             ValidateIssuer = false,
+             ValidateAudience = false
+         };
+     });
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
