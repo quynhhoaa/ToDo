@@ -1,17 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TodoList.Models;
 
 namespace TodoList.DTOs
 {
-    public class UserRequest
+    public class RegisterRequest
     {
-        [MaxLength(100)]
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
-        [MaxLength(100)]
         [Required]
         public string Username { get; set; }
-        [MaxLength(200)]
         [Required]
         public string Password { get; set; }
     }
