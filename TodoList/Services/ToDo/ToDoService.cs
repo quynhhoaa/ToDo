@@ -16,43 +16,34 @@ namespace TodoList.Services.ToDo
             _context = context;
             _mapper = mapper;
         }
-        public async Task AddNewTask(ToDoRequest toDo)
+        enum State
+        {
+            NotComplete = 0,
+            Done = 1
+        }
+        public async Task AddNewTask(Guid userId ,ToDoRequest toDo)
         {
             var item = _mapper.Map<ToDoRequest, Models.Todo>(toDo);
+            item.UserId = userId;
             item.Date= DateTime.Now;
-            item.Status = 0;
+            item.Status = (int)State.NotComplete;
             _context.Tasks.Add(item);
             await _context.SaveChangesAsync();
         }
-        public async Task CompleteTask(List<Guid> taskIDs)
+        public async Task CompleteTask(Guid userId, List<Guid> taskIDs)
         {
             using (IDbContextTransaction transaction = _context.Database.BeginTransaction())
             {
                 var task = await _context.Tasks.Where(c => taskIDs.Contains(c.Id)).ToListAsync();
                 foreach (var x in task)
                 {
-                    x.Status = 1;
+                    x.Status = (int)State.Done;
                 }
                 _context.UpdateRange(task);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
         }
-
-        public async Task CompleteTask(Guid userId, ToDoRequest toDo, List<Guid> taskIDs)
-        {
-            var item = _context.Tasks.FirstOrDefault(x => x.UserId == userId);
-            if (item != null)
-            {
-                item.CategoryId = toDo.CategoryId;
-                item.Details = toDo.Details;
-                item.Title = toDo.Title;
-                item.Date = DateTime.Now;
-                _context.Update(item);
-            }
-            await _context.SaveChangesAsync();
-        }
-
         public async Task DeleteTask(Guid taskId)
         {
             try
@@ -86,14 +77,23 @@ namespace TodoList.Services.ToDo
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Todo> GetById(Guid taskId)
+        public async Task<Todo> GetById(Guid taskId, Guid userId)
         {
             return await _context.Tasks.FirstOrDefaultAsync(x => x.Id == taskId);
         }
 
-        public Task<List<Todo>> GetTasks(Guid userID, FilterResquest filterRequest)
+        public async Task<List<Todo>> GetTasks(Guid userID, FilterResquest filterRequest)
         {
-            throw new NotImplementedException();
+            var query = _context.Tasks.Where(x => x.UserId == userID);
+            if (filterRequest.Status != null)
+            {
+                query = query.Where(x => x.Status== filterRequest.Status);
+            }    
+            if (filterRequest.Date != null)
+            {
+                query = query.Where(x => x.Date == filterRequest.Date);
+            }    
+            return await query.ToListAsync();
         }
     }
 }

@@ -26,12 +26,14 @@ namespace TodoList.Controllers
         [HttpGet("task/{taskId}")]
         public async Task<IActionResult> GetById(Guid taskId)
         {
-            return Ok(await _toDoService.GetById(taskId));
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            var item = await _toDoService.GetById(taskId, userId);
+            return Ok(item);
         }
         [HttpPost]
-        public async Task<IActionResult> AddNewTask([FromBody]ToDoRequest toDo)
+        public async Task<IActionResult> AddNewTask([FromBody]Guid userId, ToDoRequest toDo)
         {
-            await _toDoService.AddNewTask(toDo);
+            await _toDoService.AddNewTask(userId, toDo);
             return Ok();
         }
         [HttpPut]
@@ -41,13 +43,14 @@ namespace TodoList.Controllers
             return Ok(toDo);
         }
         [HttpPatch("task/complete")]
-        public async Task<IActionResult> CompleteTask([FromBody]Guid userId, ToDoRequest toDo, List<Guid> taskIDs)
+        public async Task<IActionResult> CompleteTask([FromBody] List<Guid> taskIDs)
         {
-            await _toDoService.CompleteTask(userId, toDo, taskIDs);
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            await _toDoService.CompleteTask(userId, taskIDs);
             return Ok();
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteTask(Guid userId, Guid taskId)
+        public async Task<IActionResult> DeleteTask([FromBody] Guid userId, Guid taskId)
         {
             await _toDoService.DeleteTask(userId, taskId);
             return Ok();

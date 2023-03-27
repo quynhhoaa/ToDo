@@ -1,9 +1,12 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using TodoList.Models;
+using TodoList.Services.ToDo;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -17,6 +20,10 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddScoped<IToDoService, ToDoService>();
+
+        //builder.Services.AddSingleton(Mapper);
+
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
              {
@@ -44,9 +51,9 @@ internal class Program
         }
 
         app.UseHttpsRedirection();
-
+        app.UseRouting();
         app.UseAuthorization();
-
+        app.UseAuthentication();
         app.MapControllers();
 
         app.Run();
