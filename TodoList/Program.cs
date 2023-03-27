@@ -8,6 +8,7 @@ using TodoList.Services.UserService;
 using TodoList.Services.PasswordHash;
 using TodoList.Services.TokenGenerator;
 
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -23,6 +24,7 @@ internal class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
         builder.Services.AddSingleton<BCryptPasswordHash>();
         builder.Services.AddSingleton<AccessTokenGenerator>();
         builder.Services.AddScoped<IUserService, UserService>();
@@ -39,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              ValidateAudience = false
          };
      });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
