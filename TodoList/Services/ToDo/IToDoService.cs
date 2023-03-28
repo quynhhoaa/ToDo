@@ -7,8 +7,8 @@ namespace TodoList.Services.ToDo
         Task<List<Models.Todo>> GetTasks(Guid userID, FilterResquest filterRequest);
         Task<Models.Todo> GetById(Guid taskid, Guid userId);
         Task AddNewTask(Guid userId, ToDoRequest toDo);
-        Task EditTask(/*Guid userId, Guid taskId,*/ ToDoRequest toDo);
-        Task DeleteTask( Guid taskId);
+        Task EditTask(Guid userId, Guid taskId, ToDoRequest toDo);
+        Task DeleteTask(Guid userId, Guid taskId);
         Task CompleteTask(Guid userId, List<Guid> taskIDs);
     }
 }

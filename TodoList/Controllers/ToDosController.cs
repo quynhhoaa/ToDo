@@ -38,9 +38,10 @@ namespace TodoList.Controllers
             return Ok();
         }
         [HttpPut]
-        public async Task<IActionResult> EditTask([FromBody] ToDoRequest toDo)
+        public async Task<IActionResult> Edit([FromBody] ToDoRequest toDo, Guid taskId)
         {
-            await _toDoService.EditTask(toDo);
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).FirstOrDefault());
+            await _toDoService.EditTask(userId, taskId, toDo);
             return Ok(toDo);
         }
         [HttpPatch("task/complete")]
@@ -51,9 +52,10 @@ namespace TodoList.Controllers
             return Ok();
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteTask([FromBody] Guid taskId)
+        public async Task<IActionResult> DeleteTask(Guid taskId)
         {
-            await _toDoService.DeleteTask(taskId);
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            await _toDoService.DeleteTask(userId, taskId);
             return Ok();
         }
     }

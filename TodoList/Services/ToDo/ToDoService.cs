@@ -54,10 +54,23 @@ namespace TodoList.Services.ToDo
                 Console.WriteLine(ex);
             }
         }
-        public async Task EditTask(ToDoRequest toDo)
+        public async Task DeleteTask(Guid userId, Guid taskId)
         {
-            _context.Update(toDo);
-
+            var item = _context.Tasks.FirstOrDefault(x => x.UserId == userId && x.Id == taskId);
+            _context.Tasks.Remove(item);
+            await _context.SaveChangesAsync();
+        }
+        public async Task EditTask(Guid userId, Guid taskId, ToDoRequest toDo)
+        {
+            var item = _context.Tasks.FirstOrDefault(c => c.UserId == userId && c.Id == taskId);
+            if (item != null)
+            {
+                item.CategoryId = toDo.CategoryId;
+                item.Details = toDo.Details;
+                item.Title = toDo.Title;
+                item.Date = DateTime.Now;
+                _context.Update(item);
+            }
             await _context.SaveChangesAsync();
         }
 
