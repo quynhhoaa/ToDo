@@ -24,6 +24,9 @@ namespace TodoList.Services.ToDo
         public async Task AddNewTask(Guid userId ,ToDoRequest toDo)
         {
             var item = _mapper.Map<Todo>(toDo);
+            item.UserId = userId;
+            item.Date = DateTime.Now;
+            item.Status = (int)State.NotComplete;
             _context.Tasks.Add(item);
             await _context.SaveChangesAsync();
         }
@@ -41,19 +44,6 @@ namespace TodoList.Services.ToDo
                 await transaction.CommitAsync();
             }
         }
-        public async Task DeleteTask(Guid taskId)
-        {
-            try
-            {
-                var item = _context.Tasks.Where(x => x.Id == taskId).FirstOrDefault();
-                _context.Tasks.Remove(item);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
         public async Task DeleteTask(Guid userId, Guid taskId)
         {
             var item = _context.Tasks.FirstOrDefault(x => x.UserId == userId && x.Id == taskId);
@@ -62,15 +52,10 @@ namespace TodoList.Services.ToDo
         }
         public async Task EditTask(Guid userId, Guid taskId, ToDoRequest toDo)
         {
-            var item = _context.Tasks.FirstOrDefault(c => c.UserId == userId && c.Id == taskId);
-            if (item != null)
-            {
-                item.CategoryId = toDo.CategoryId;
-                item.Details = toDo.Details;
-                item.Title = toDo.Title;
-                item.Date = DateTime.Now;
-                _context.Update(item);
-            }
+            var item = _mapper.Map<Todo>(toDo);
+            item.UserId = userId;
+            item.Date = DateTime.Now;
+            _context.Tasks.Update(item);
             await _context.SaveChangesAsync();
         }
 
