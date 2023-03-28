@@ -40,7 +40,6 @@ namespace TodoList.Controllers
         [HttpPut]
         public async Task<IActionResult> EditTask([FromBody] ToDoRequest toDo)
         {
-            //var userId = Guid.Parse(HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).FirstOrDefault());
             await _toDoService.EditTask(toDo);
             return Ok(toDo);
         }
