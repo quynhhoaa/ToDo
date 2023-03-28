@@ -8,7 +8,7 @@ using TodoList.Models;
 using TodoList.Services.UserService;
 using TodoList.Services.PasswordHash;
 using TodoList.Services.TokenGenerator;
-
+using TodoList.Services.ToDo;
 
 internal class Program
 {
@@ -23,23 +23,18 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-
         builder.Services.AddSingleton<BCryptPasswordHash>();
         builder.Services.AddSingleton<AccessTokenGenerator>();
         builder.Services.AddScoped<IUserService, UserService>();
-        
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-     .AddJwtBearer(options =>
-     {
-         options.TokenValidationParameters = new TokenValidationParameters
-         {
-             ValidateIssuerSigningKey = true,
-             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                 .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
-             ValidateIssuer = false,
-             ValidateAudience = false
-         };
-     });
+        builder.Services.AddScoped<IToDoService, ToDoService>();
+        builder.Services.AddAutoMapper(typeof(Program));
+        var mappingConfig = new MapperConfiguration(mc =>
+        {
+            mc.AddProfile(new MappingProfile());
+        });
+
+        IMapper mapper = mappingConfig.CreateMapper();
+        builder.Services.AddSingleton(mapper);
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>

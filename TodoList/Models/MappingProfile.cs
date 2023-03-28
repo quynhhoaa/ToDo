@@ -7,6 +7,7 @@ namespace TodoList.Models
     {
         public MappingProfile()
         {
+            CreateMap<Todo, ToDoRequest>();
             CreateMap<User, RegisterRequest>().ReverseMap();
             CreateMap<User, UserResponse>().ReverseMap();
         }
