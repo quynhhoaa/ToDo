@@ -55,8 +55,7 @@ namespace TodoList.Controllers
         public async Task<IActionResult> DeleteTask(Guid taskId)
         {
             var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
-            await _toDoService.DeleteTask(userId, taskId);
-            return Ok();
+            return Ok(await _toDoService.DeleteTask(userId, taskId));
         }
     }
 }

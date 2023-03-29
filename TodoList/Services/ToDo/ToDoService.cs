@@ -44,11 +44,29 @@ namespace TodoList.Services.ToDo
                 await transaction.CommitAsync();
             }
         }
-        public async Task DeleteTask(Guid userId, Guid taskId)
+        public async Task<Response> DeleteTask(Guid userId, Guid taskId)
         {
-            var item = _context.Tasks.FirstOrDefault(x => x.UserId == userId && x.Id == taskId);
-            _context.Tasks.Remove(item);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var item = await _context.Tasks.FirstOrDefaultAsync(x => x.UserId == userId && x.Id == taskId);
+                if (item != null)
+                {
+                    item.Status = 0;
+                    _context.Tasks.Update(item);
+                    await _context.SaveChangesAsync();
+                    return new Response { Message = "Delete success" };
+                }
+                else
+                {
+                    return new Response { Message = "Delete fail" };
+                }
+                
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
         }
         public async Task EditTask(Guid userId, Guid taskId, ToDoRequest toDo)
         {
@@ -61,7 +79,7 @@ namespace TodoList.Services.ToDo
 
         public async Task<Todo> GetById(Guid taskId, Guid userId)
         {
-            return await _context.Tasks.FirstOrDefaultAsync(x => x.Id == taskId);
+            return await _context.Tasks.FirstOrDefaultAsync(x => x.Id == taskId  && x.UserId==userId);
         }
 
         public async Task<List<Todo>> GetTasks(Guid userID, FilterResquest filterRequest)
