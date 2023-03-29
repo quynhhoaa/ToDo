@@ -26,32 +26,36 @@ namespace TodoList.Controllers
         [HttpGet("task/{taskId}")]
         public async Task<IActionResult> GetById(Guid taskId)
         {
-            return Ok(await _toDoService.GetById(taskId));
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            var item = await _toDoService.GetById(taskId, userId);
+            return Ok(item);
         }
         [HttpPost]
-        public async Task<IActionResult> AddNewTask([FromBody]ToDoRequest toDo)
+        public async Task<IActionResult> AddNewTask([FromBody] ToDoRequest toDo)
         {
-            await _toDoService.AddNewTask(toDo);
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            await _toDoService.AddNewTask(userId, toDo);
             return Ok();
         }
-        [HttpPut]
-        public async Task<IActionResult> EditTask(Guid userId,Guid taskId, ToDoRequest toDo)
+        [HttpPut("{taskId}")]
+        public async Task<IActionResult> Edit([FromBody] ToDoRequest toDo, Guid taskId)
         {
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).FirstOrDefault());
             await _toDoService.EditTask(userId, taskId, toDo);
             return Ok(toDo);
         }
-        [HttpPost]
-        [Route("task/complete")]
-        public async Task<IActionResult> CompleteTask(Guid userId, ToDoRequest toDo, List<Guid> taskIDs)
+        [HttpPatch("task/complete")]
+        public async Task<IActionResult> CompleteTask([FromBody] List<Guid> taskIDs)
         {
-            await _toDoService.CompleteTask(userId, toDo, taskIDs);
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            await _toDoService.CompleteTask(userId, taskIDs);
             return Ok();
         }
-        [HttpDelete]
-        public async Task<IActionResult> DeleteTask(Guid userId, Guid taskId)
+        [HttpDelete("{taskId}")]
+        public async Task<IActionResult> DeleteTask(Guid taskId)
         {
-            await _toDoService.DeleteTask(userId, taskId);
-            return Ok();
+            var userId = Guid.Parse(HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault());
+            return Ok(await _toDoService.DeleteTask(userId, taskId));
         }
     }
 }
